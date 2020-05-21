@@ -1,26 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from 'react'
+import {Switch, Route, Redirect} from 'react-router-dom'
+import Sidebar from "./components/Sidebar/Sidebar.jsx"
+import Knowledge from "./components/Knowledge/Knowledge.jsx"
+import Data from "./components/Data/Data"
+import 'uikit/dist/js/uikit.min'
+import 'uikit/dist/css/uikit.min.css'
+import './main.sass'
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	return (
+		<React.Fragment>
+			<Sidebar/>
+			<Switch>
+				<Redirect exact from="/" to="knowledge"/>
+				<Route path='/knowledge' component={Knowledge}/>
+				<Route path='/data' component={Data}/>
+			</Switch>
+		</React.Fragment>
+	)
 }
 
-export default App;
+export default App
