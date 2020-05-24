@@ -8,6 +8,7 @@ export default class Groups extends React.Component {
 		super(props)
 		this.state = {
 			groups: this.props.groups,
+			disciplines: this.props.disciplines,
 		}
 
 		this.setGroups = this.setGroups.bind(this)
@@ -26,7 +27,8 @@ export default class Groups extends React.Component {
 		for (const key in groupsFromStorage) {
 			groupsArray.push(<Group
 				name={key}
-				disciplines={groupsFromStorage[key]}
+				groupDisciplines={groupsFromStorage[key]}
+				disciplines={this.state.disciplines}
 				key={key + groupsFromStorage[key]}
 				setKnowledge={this.props.setKnowledge}
 				getKnowledge={this.props.getKnowledge}
@@ -39,6 +41,7 @@ export default class Groups extends React.Component {
 					setGroups={this.setGroups}
 					setKnowledge={this.props.setKnowledge}
 					getKnowledge={this.props.getKnowledge}
+					disciplines={this.state.disciplines}
 				/>
 			</React.Fragment>
 		)

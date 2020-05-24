@@ -1,19 +1,24 @@
 import React from "react"
-import MultiSelectBox from 'react-multiselect-box'
-import 'react-multiselect-box/build/css/index.css'
+import ChooseDiscipline from "./ChooseDiscipline"
 
 export default class NewGroup extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
 			groupName: '',
-			groupDisciplines: [],
-			selectedOne: [],
-			selectedTwo: [],
+			groupDisciplines: {},
+			allDisciplines: this.props.disciplines,
 		}
 
 		this.handleChange = this.handleChange.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
+		this.updateSelected = this.updateSelected.bind(this)
+	}
+
+	updateSelected(selected) {
+		this.setState({
+			groupDisciplines: selected,
+		})
 	}
 
 	handleChange(event) {
@@ -32,7 +37,7 @@ export default class NewGroup extends React.Component {
 
 			this.setState({
 				groupName: '',
-				groupDisciplines: [],
+				groupDisciplines: {},
 			})
 		}
 
@@ -62,44 +67,14 @@ export default class NewGroup extends React.Component {
 							onClick={this.handleSubmit}>Добавить
 					</button>
 				</div>
-
-				<MultiSelectBox
-					options={[
-						{desc: 'Item 1', value: '1'},
-						{desc: 'Item 2', value: '2'},
-						{desc: 'Item 3', value: '3'},
-					]}
-					labelKey="desc"
-					valueKey="value"
-					onAdd={selectedItem => {
-						this.setState({
-							selectedOne: [...this.state.selectedOne, selectedItem.value],
-						})
-					}}
-					onRemove={(removedItem, index) => {
-						this.setState({
-							selectedOne: [
-								...this.state.selectedOne.filter(
-									item => item !== removedItem.value,
-								),
-							],
-						})
-					}}
-					onSelectAll={selectedItems => {
-						this.setState({
-							selectedOne: [
-								...this.state.selectedOne,
-								...selectedItems.map(item => item.value),
-							],
-						})
-					}}
-					onRemoveAll={() =>
-						this.setState({
-							selectedOne: [],
-						})
-					}
-					valueArray={this.state.selectedOne}
-				/>
+				<div className="uk-width-3-4 uk-flex chooseDiscipline">
+					<ChooseDiscipline
+						disciplines={this.state.allDisciplines}
+						selected={this.state.groupDisciplines}
+						updateSelected={this.updateSelected}
+						name="newGroup"
+					/>
+				</div>
 			</div>
 		)
 	}
