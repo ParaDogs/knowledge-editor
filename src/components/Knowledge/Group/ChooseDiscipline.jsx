@@ -12,6 +12,7 @@ export default class ChooseDiscipline extends React.Component {
 		for (const key in this.props.disciplines) {
 			disciplines.push({value: key, label: key})
 		}
+
 		let selectedDiscplines = []
 		if (this.props.selected !== undefined) {
 			selectedDiscplines = Object.keys(this.props.selected)
@@ -51,7 +52,7 @@ export default class ChooseDiscipline extends React.Component {
 			selectTimeElements.push(<ChooseTime key={key}
 												disciplineName={key}
 												updateGroupDisciplines={this.updateGroupDisciplines}
-												value={this.props.name === 'newGroup' ? '33' : this.props.selected[key]}
+												value={this.props.name === 'newGroup' ? '' : this.props.selected[key]}
 			/>)
 		}
 		return (
@@ -65,7 +66,7 @@ export default class ChooseDiscipline extends React.Component {
 							this.selectedRef = c
 						}}/>
 				</div>
-				<div className="groupDiscipline">
+				<div onMouseEnter={() => syncscroll.reset()}>
 					<div className="groupDiscipline-box uk-flex uk-flex-column syncscroll"
 						 name={this.props.name}
 						 id={this.props.name}>
