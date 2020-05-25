@@ -3,6 +3,7 @@ import {Route, Switch} from "react-router-dom"
 import Classrooms from "./Classroom/Classrooms"
 import Disciplines from "./Discipline/Disciplines"
 import Groups from "./Group/Groups"
+import Teachers from "./Teacher/Teachers"
 
 export default class Knowledge extends React.Component {
 	constructor(props) {
@@ -58,6 +59,13 @@ export default class Knowledge extends React.Component {
 							</Route>
 							<Route path="/knowledge/groups">
 								<Groups
+									disciplines={this.state.knowledge.disciplines}
+									setKnowledge={this.setKnowledge}
+									getKnowledge={this.getKnowledge}
+								/>
+							</Route>
+							<Route path="/knowledge/teachers">
+								<Teachers
 									disciplines={this.state.knowledge.disciplines}
 									setKnowledge={this.setKnowledge}
 									getKnowledge={this.getKnowledge}
