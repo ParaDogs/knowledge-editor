@@ -7,7 +7,9 @@ export default class Time extends React.Component {
 		super(props)
 		this.state = {
 			startTime: this.props.startTime,
+			prevStartTime: this.props.startTime,
 			endTime: this.props.endTime,
+			prevEndTime: this.props.endTime,
 			durationInMinutes: 90,
 		}
 		this.startTime = React.createRef()
@@ -17,7 +19,6 @@ export default class Time extends React.Component {
 		this.updateStartTime = this.updateStartTime.bind(this)
 		this.updateEndTime = this.updateEndTime.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
-		// TODO handle edit times
 	}
 
 	componentDidMount() {
@@ -36,7 +37,13 @@ export default class Time extends React.Component {
 	}
 
 	handleStartChange(value) {
-		this.setState({startTime: value})
+		this.setState({startTime: value}, () => {
+			let knowledge = this.props.getKnowledge()
+			knowledge['times'] = knowledge['times'].filter(el => el.startTime !== this.state.prevStartTime)
+			knowledge['times'].push({startTime: this.state.startTime, endTime: this.state.endTime})
+			this.props.setTimes(knowledge['times'])
+			this.props.setKnowledge(knowledge)
+		})
 		const newEnd = moment(value, 'HH:mm').add(this.state.durationInMinutes, 'minutes')
 		this.updateEndTime(newEnd.format('HH:mm'))
 	}
