@@ -39,8 +39,10 @@ export default class Time extends React.Component {
 	handleStartChange(value) {
 		this.setState({startTime: value}, () => {
 			let knowledge = this.props.getKnowledge()
-			knowledge['times'] = knowledge['times'].filter(el => el.startTime !== this.state.prevStartTime)
-			knowledge['times'].push({startTime: this.state.startTime, endTime: this.state.endTime})
+			knowledge['times'] = knowledge['times'].map(el => el.startTime !== this.state.prevStartTime ? el : {
+				startTime: this.state.startTime,
+				endTime: this.state.endTime,
+			})
 			this.props.setTimes(knowledge['times'])
 			this.props.setKnowledge(knowledge)
 		})
