@@ -21,7 +21,7 @@ export default class Times extends React.Component {
 	}
 
 	render() {
-		let times = this.state.times.map(key => (
+		let times = this.state.times.sort((a, b) => a.startTime > b.startTime ? 1 : -1).map(key => (
 			<Time
 				startTime={key.startTime}
 				endTime={key.endTime}
