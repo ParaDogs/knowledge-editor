@@ -31,9 +31,9 @@ export default class Knowledge extends React.Component {
 	}
 
 	setKnowledge(newKnowledge) {
-		// this.setState({
-		// 	knowledge: newKnowledge,
-		// })
+		this.setState({
+			knowledge: newKnowledge,
+		})
 		const stringKnowledge = JSON.stringify(newKnowledge)
 		localStorage.setItem('knowledge', stringKnowledge)
 	}
@@ -60,6 +60,7 @@ export default class Knowledge extends React.Component {
 							</Route>
 							<Route path="/knowledge/groups">
 								<Groups
+									groups={this.state.knowledge.groups}
 									disciplines={this.state.knowledge.disciplines}
 									setKnowledge={this.setKnowledge}
 									getKnowledge={this.getKnowledge}
@@ -67,6 +68,7 @@ export default class Knowledge extends React.Component {
 							</Route>
 							<Route path="/knowledge/teachers">
 								<Teachers
+									teachers={this.state.knowledge.teachers}
 									disciplines={this.state.knowledge.disciplines}
 									setKnowledge={this.setKnowledge}
 									getKnowledge={this.getKnowledge}

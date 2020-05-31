@@ -21,7 +21,7 @@ export default class ChooseTime extends React.Component {
 
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value})
-		this.props.updateGroupDisciplines()
+		this.props.updateTimes()
 	}
 
 	render() {

@@ -8,58 +8,61 @@ import syncscroll from 'sync-scroll/syncscroll'
 export default class ChooseDiscipline extends React.Component {
 	constructor(props) {
 		super(props)
-		let disciplines = []
-		for (const key in this.props.disciplines) {
-			disciplines.push({value: key, label: key})
+
+		// Need to remove disciplines that was deleted
+		let onlyExistDisciplines = [], onlyExistTimes = []
+		for (let i = 0; i < this.props.selected.length; i++) {
+			if (this.props.allDisciplines.some(el => el.id === this.props.selected[i])) {
+				onlyExistDisciplines.push(this.props.selected[i])
+				onlyExistTimes.push(this.props.times[i])
+			}
 		}
 
-		let selectedDiscplines = []
-		if (this.props.selected !== undefined) {
-			selectedDiscplines = Object.keys(this.props.selected)
-		}
 		this.state = {
-			selected: selectedDiscplines || [],
-			groupDisciplines: {},
-			disciplines: disciplines,
+			selected: onlyExistDisciplines || [],
+			times: onlyExistTimes || [],
 		}
 
 		this.onChange = this.onChange.bind(this)
-		this.updateGroupDisciplines = this.updateGroupDisciplines.bind(this)
+		this.updateTimes = this.updateTimes.bind(this)
 	}
 
 	componentDidMount() {
 		this.selectedRef.classList.add('syncscroll')
 		this.selectedRef.name = this.props.name
+		this.props.updateSelected(this.state.selected, this.state.times) // update deleted disciplines
 	}
 
 	onChange(selected) {
-		this.setState({selected}, this.updateGroupDisciplines)
+		this.setState({selected}, this.updateTimes)
 	}
 
-	updateGroupDisciplines() {
-		let newGroupDiscplines = {}
-		for (const key of this.state.selected) {
-			const times = document.getElementById(this.props.name)
-			let keyTimeNode = times.children[this.state.selected.findIndex(el => key === el)]
-			newGroupDiscplines[key] = keyTimeNode.value
-		}
-		this.setState({groupDisciplines: newGroupDiscplines}, () => this.props.updateSelected(this.state.groupDisciplines))
+	updateTimes() {
+		const times = document.getElementById(this.props.name)
+		console.log(this.state.selected)
+		let newTimes = this.state.selected.map(discipline => {
+			let keyTimeNode = times.children[this.state.selected.findIndex(el => discipline === el)]
+			console.log(discipline, keyTimeNode.value)
+			return keyTimeNode.value
+		})
+		this.setState({times: newTimes}, () => this.props.updateSelected(this.state.selected, this.state.times))
 	}
 
 	render() {
-		let selectTimeElements = []
-		for (const key of this.state.selected) {
-			selectTimeElements.push(<ChooseTime key={key}
-												disciplineName={key}
-												updateGroupDisciplines={this.updateGroupDisciplines}
-												value={this.props.name === 'newGroup' ? '' : this.props.selected[key]}
-			/>)
-		}
+		let selectTimeElements = this.state.selected.map((el, ind) => <ChooseTime
+			key={el}
+			disciplineName={el}
+			updateTimes={this.updateTimes}
+			value={this.props.name === 'newGroup' ? '' : this.state.times[ind]}
+		/>)
+		let allDisciplines = this.props.allDisciplines?.map(el => {
+			return {value: el.id, label: el.name}
+		})
 		return (
 			<React.Fragment>
 				<div className="uk-width-1-1" onMouseEnter={() => syncscroll.reset()}>
 					<DualListBox
-						options={this.state.disciplines}
+						options={allDisciplines}
 						selected={this.state.selected}
 						onChange={this.onChange}
 						selectedRef={c => {

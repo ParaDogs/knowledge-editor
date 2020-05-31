@@ -5,10 +5,9 @@ export default class Disciplines extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			disciplineName: props.name,
+			name: props.name,
 			prevName: props.name,
-			disciplineType: props.type,
-			deleted: false,
+			type: props.type,
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -18,29 +17,25 @@ export default class Disciplines extends React.Component {
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, () => {
 			let knowledge = this.props.getKnowledge()
-			delete knowledge['disciplines'][this.state.prevName]
-			this.setState({prevName: this.state.disciplineName})
-			knowledge['disciplines'][this.state.disciplineName] = this.state.disciplineType
+			knowledge['disciplines'] = knowledge['disciplines'].map(el => el.name === this.state.prevName ? {
+				name: this.state.name,
+				type: this.state.type,
+				id: el.id,
+			} : el)
+			this.setState({prevName: this.state.name})
 			this.props.setKnowledge(knowledge)
 		})
 	}
 
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
-		delete knowledge['disciplines'][this.state.classroomNumber]
+		knowledge['disciplines'] = knowledge['disciplines'].filter(el => el.name !== this.state.prevName)
 		this.props.setKnowledge(knowledge)
-		this.setState({
-			deleted: true,
-		})
-		// Чтобы страница не перезагружалась
 		event.preventDefault()
 	}
 
 
 	render() {
-		if (this.state.deleted) {
-			return ''
-		}
 		return (
 			<div className="uk-flex uk-flex-center uk-child-width-1-4 classroom-row">
 				<div>
@@ -48,9 +43,9 @@ export default class Disciplines extends React.Component {
 						className="uk-input"
 						type="text"
 						placeholder="Номер аудитории"
-						value={this.state.disciplineName}
+						value={this.state.name}
 						onChange={this.handleChange}
-						name="disciplineName"
+						name="name"
 					/>
 				</div>
 
@@ -58,8 +53,8 @@ export default class Disciplines extends React.Component {
 					<select
 						className="uk-select"
 						onChange={this.handleChange}
-						value={this.state.disciplineType}
-						name="disciplineType"
+						value={this.state.type}
+						name="type"
 					>
 						<option value="lecture">Лекционная</option>
 						<option value="physical">Физическая</option>

@@ -1,14 +1,14 @@
 import React from "react"
+import {v4 as uuid} from 'uuid'
 
 export default class NewClassroom extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			classroomNumber: '',
-			classroomType: 'lecture', // первая в списке, выбрана по умолчанию
+			name: '',
+			type: 'lecture', // первая в списке, выбрана по умолчанию
 		}
 
-		this.textInput = React.createRef()
 		this.handleChange = this.handleChange.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 	}
@@ -18,24 +18,24 @@ export default class NewClassroom extends React.Component {
 	}
 
 	handleSubmit(event) {
-		if (this.state.classroomNumber !== '') {
+		console.log("Submit")
+		if (this.state.name !== '') {
+
 			let knowledge = this.props.getKnowledge()
 			if (knowledge['classrooms'] == null) {
-				knowledge['classrooms'] = {}
+				knowledge['classrooms'] = []
 			}
-			knowledge['classrooms'][this.state.classroomNumber] = this.state.classroomType
-			this.props.setClassrooms(knowledge['classrooms'])
-			this.props.setKnowledge(knowledge)
+
+			if (!knowledge['classrooms'].some(el => el.name === this.state.name)) {
+				knowledge['classrooms'].push({id: uuid(), name: this.state.name, type: this.state.type})
+				this.props.setKnowledge(knowledge)
+			}
 
 			this.setState({
-				classroomNumber: '',
-				classroomType: 'lecture', // первая в списке, выбрана по умолчанию
+				name: '',
+				type: 'lecture',
 			})
-
-			this.textInput.current.focus()
 		}
-
-		// Чтобы страница не перезагружалась
 		event.preventDefault()
 	}
 
@@ -47,9 +47,9 @@ export default class NewClassroom extends React.Component {
 						className="uk-input"
 						type="text"
 						placeholder="Номер аудитории"
-						value={this.state.classroomNumber}
+						value={this.state.name}
 						onChange={this.handleChange}
-						name="classroomNumber"
+						name="name"
 						autoComplete="off"
 						ref={this.textInput}
 					/>
@@ -59,8 +59,8 @@ export default class NewClassroom extends React.Component {
 					<select
 						className="uk-select"
 						onChange={this.handleChange}
-						value={this.state.classroomType}
-						name="classroomType"
+						value={this.state.type}
+						name="type"
 					>
 						<option value="lecture">Лекционная</option>
 						<option value="physical">Физическая</option>

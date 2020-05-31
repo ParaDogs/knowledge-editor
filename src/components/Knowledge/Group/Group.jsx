@@ -1,16 +1,14 @@
 import React from "react"
 import ChooseDiscipline from "./ChooseDiscipline"
 
-
 export default class Group extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			groupName: props.name,
+			name: props.name,
 			prevName: props.name,
-			groupDisciplines: props.groupDisciplines,
-			allDisciplines: this.props.disciplines,
-			deleted: false,
+			disciplines: props.disciplines,
+			times: props.times,
 			showDiscipline: false,
 		}
 
@@ -28,39 +26,40 @@ export default class Group extends React.Component {
 		event.preventDefault()
 	}
 
-	updateSelected(selected) {
+	updateSelected(selected, times) {
+		if (selected.length !== times.length) {
+			throw new Error("Length might be the same")
+		}
 		this.setState({
-			groupDisciplines: selected,
+			disciplines: selected,
+			times: times,
 		}, this.updateKnowledge)
-	}
-
-	updateKnowledge() {
-		let knowledge = this.props.getKnowledge()
-		delete knowledge['groups'][this.state.prevName]
-		this.setState({prevName: this.state.groupName})
-		knowledge['groups'][this.state.groupName] = this.state.groupDisciplines
-		this.props.setKnowledge(knowledge)
 	}
 
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, this.updateKnowledge)
 	}
 
+	updateKnowledge() {
+		let knowledge = this.props.getKnowledge()
+		knowledge['groups'] = knowledge['groups'].map(el => el.name === this.state.prevName ? {
+			name: this.state.name,
+			disciplines: this.state.disciplines,
+			times: this.state.times,
+			id: el.id,
+		} : el)
+		this.props.setKnowledge(knowledge)
+		this.setState({prevName: this.state.name})
+	}
+
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
-		delete knowledge['groups'][this.state.groupName]
+		knowledge['groups'] = knowledge['groups'].filter(el => el.name !== this.state.name)
 		this.props.setKnowledge(knowledge)
-		this.setState({
-			deleted: true,
-		})
-		// Чтобы страница не перезагружалась
 		event.preventDefault()
 	}
 
 	render() {
-		if (this.state.deleted) {
-			return ''
-		}
 		return (
 			<div className="uk-flex uk-flex-column uk-flex-middle groups-row">
 				<div className="uk-width-3-4 uk-flex uk-flex-center uk-child-width-1-4">
@@ -72,8 +71,8 @@ export default class Group extends React.Component {
 								placeholder="Введите название группы"
 								onChange={this.handleChange}
 								autoComplete="off"
-								value={this.state.groupName}
-								name="groupName"
+								value={this.state.name}
+								name="name"
 							/>
 						</label>
 					</div>
@@ -95,10 +94,11 @@ export default class Group extends React.Component {
 				<div className="uk-width-3-4 uk-flex uk-flex-center chooseDiscipline">
 					{this.state.showDiscipline &&
 					<ChooseDiscipline
-						disciplines={this.state.allDisciplines}
-						selected={this.state.groupDisciplines}
+						name={this.state.name}
+						times={this.state.times}
+						selected={this.state.disciplines}
 						updateSelected={this.updateSelected}
-						name={this.state.groupName}
+						allDisciplines={this.props.allDisciplines}
 					/>
 					}
 				</div>

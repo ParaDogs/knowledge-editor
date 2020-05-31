@@ -1,13 +1,13 @@
 import React from "react"
 import ChooseDiscipline from "./ChooseDiscipline"
+import {v4 as uuid} from "uuid"
 
 export default class NewTeacher extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			teacherName: '',
-			teacherDisciplines: [],
-			allDisciplines: this.props.disciplines,
+			name: '',
+			disciplines: [],
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -17,7 +17,7 @@ export default class NewTeacher extends React.Component {
 
 	updateSelected(selected) {
 		this.setState({
-			teacherDisciplines: selected,
+			disciplines: selected,
 		})
 	}
 
@@ -26,22 +26,25 @@ export default class NewTeacher extends React.Component {
 	}
 
 	handleSubmit(event) {
-		if (this.state.teacherName !== '') {
+		if (this.state.name !== '') {
 			let knowledge = this.props.getKnowledge()
 			if (knowledge['teachers'] == null) {
-				knowledge['teachers'] = {}
+				knowledge['teachers'] = []
 			}
-			knowledge['teachers'][this.state.teacherName] = this.state.teacherDisciplines
-			this.props.setTeachers(knowledge['teachers'])
-			this.props.setKnowledge(knowledge)
+			if (!knowledge['teachers'].some(el => el.name === this.state.name)) {
+				knowledge['teachers'].push({
+					id: uuid(),
+					name: this.state.name,
+					disciplines: this.state.disciplines,
+				})
+				this.props.setKnowledge(knowledge)
+			}
 
 			this.setState({
-				teacherName: '',
-				teacherDisciplines: [],
+				name: '',
+				disciplines: [],
 			})
 		}
-
-		// Чтобы страница не перезагружалась
 		event.preventDefault()
 	}
 
@@ -55,9 +58,9 @@ export default class NewTeacher extends React.Component {
 								className="uk-input"
 								type="text"
 								placeholder="Введите ФИО преподавателя"
-								value={this.state.teacherName}
+								value={this.state.name}
 								onChange={this.handleChange}
-								name="teacherName"
+								name="name"
 								autoComplete="off"
 							/>
 						</label>
@@ -69,10 +72,10 @@ export default class NewTeacher extends React.Component {
 				</div>
 				<div className="uk-width-3-4 uk-flex chooseDiscipline">
 					<ChooseDiscipline
-						disciplines={this.state.allDisciplines}
-						selected={this.state.teacherDisciplines}
-						updateSelected={this.updateSelected}
 						name="newTeacher"
+						selected={this.state.disciplines}
+						updateSelected={this.updateSelected}
+						allDisciplines={this.props.allDisciplines}
 					/>
 				</div>
 			</div>

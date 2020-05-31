@@ -1,11 +1,12 @@
 import React from "react"
+import {v4 as uuid} from 'uuid'
 
 export default class NewDiscipline extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			disciplineName: '',
-			disciplineType: 'lecture',
+			name: '',
+			type: 'lecture',
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -17,18 +18,20 @@ export default class NewDiscipline extends React.Component {
 	}
 
 	handleSubmit(event) {
-		if (this.state.disciplineName !== '') {
+		if (this.state.name !== '') {
 			let knowledge = this.props.getKnowledge()
 			if (knowledge['disciplines'] == null) {
-				knowledge['disciplines'] = {}
+				knowledge['disciplines'] = []
 			}
-			knowledge['disciplines'][this.state.disciplineName] = this.state.disciplineType
-			this.props.setDisciplines(knowledge['disciplines'])
-			this.props.setKnowledge(knowledge)
+
+			if (!knowledge['disciplines'].some(el => el.name === this.state.name)) {
+				knowledge['disciplines'].push({id: uuid(), name: this.state.name, type: this.state.type})
+				this.props.setKnowledge(knowledge)
+			}
 
 			this.setState({
-				disciplineName: '',
-				disciplineType: 'lecture',
+				name: '',
+				type: 'lecture',
 			})
 		}
 		event.preventDefault()
@@ -40,9 +43,9 @@ export default class NewDiscipline extends React.Component {
 				<div>
 					<label>
 						<input className="uk-input" type="text" placeholder="Введите название дисциплины"
-							   value={this.state.disciplineName}
+							   value={this.state.name}
 							   onChange={this.handleChange}
-							   name="disciplineName"
+							   name="name"
 							   autoComplete="off"
 						/>
 					</label>
@@ -51,7 +54,7 @@ export default class NewDiscipline extends React.Component {
 				<div className="uk-margin-left">
 					<label>
 						<select className="uk-select" onChange={this.handleChange}
-								value={this.state.disciplineType} name="disciplineType">
+								value={this.state.type} name="type">
 							<option value="lecture">Лекционная</option>
 							<option value="physical">Физическая</option>
 							<option value="chemical">Химическая</option>

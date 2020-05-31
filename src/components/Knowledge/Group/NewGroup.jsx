@@ -1,13 +1,14 @@
 import React from "react"
 import ChooseDiscipline from "./ChooseDiscipline"
+import {v4 as uuid} from "uuid"
 
 export default class NewGroup extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			groupName: '',
-			groupDisciplines: {},
-			allDisciplines: this.props.disciplines,
+			name: '',
+			disciplines: [],
+			times: [],
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -15,9 +16,13 @@ export default class NewGroup extends React.Component {
 		this.updateSelected = this.updateSelected.bind(this)
 	}
 
-	updateSelected(selected) {
+	updateSelected(selected, times) {
+		if (selected.length !== times.length) {
+			throw new Error("Length might be the same")
+		}
 		this.setState({
-			groupDisciplines: selected,
+			disciplines: selected,
+			times: times,
 		})
 	}
 
@@ -26,22 +31,27 @@ export default class NewGroup extends React.Component {
 	}
 
 	handleSubmit(event) {
-		if (this.state.groupName !== '') {
+		if (this.state.name !== '') {
 			let knowledge = this.props.getKnowledge()
 			if (knowledge['groups'] == null) {
-				knowledge['groups'] = {}
+				knowledge['groups'] = []
 			}
-			knowledge['groups'][this.state.groupName] = this.state.groupDisciplines
-			this.props.setGroups(knowledge['groups'])
-			this.props.setKnowledge(knowledge)
+			if (!knowledge['groups'].some(el => el.name === this.state.name)) {
+				knowledge['groups'].push({
+					id: uuid(),
+					name: this.state.name,
+					disciplines: this.state.disciplines,
+					times: this.state.times,
+				})
+				this.props.setKnowledge(knowledge)
+			}
 
 			this.setState({
-				groupName: '',
-				groupDisciplines: {},
+				name: '',
+				disciplines: [],
+				times: [],
 			})
 		}
-
-		// Чтобы страница не перезагружалась
 		event.preventDefault()
 	}
 
@@ -55,9 +65,9 @@ export default class NewGroup extends React.Component {
 								className="uk-input"
 								type="text"
 								placeholder="Введите название группы"
-								value={this.state.groupName}
+								value={this.state.name}
 								onChange={this.handleChange}
-								name="groupName"
+								name="name"
 								autoComplete="off"
 							/>
 						</label>
@@ -69,8 +79,8 @@ export default class NewGroup extends React.Component {
 				</div>
 				<div className="uk-width-3-4 uk-flex chooseDiscipline">
 					<ChooseDiscipline
-						disciplines={this.state.allDisciplines}
-						selected={this.state.groupDisciplines}
+						allDisciplines={this.props.allDisciplines}
+						selected={this.state.disciplines}
 						updateSelected={this.updateSelected}
 						name="newGroup"
 					/>

@@ -5,10 +5,9 @@ export default class Classroom extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			classroomNumber: props.number,
-			prevNumber: props.number,
-			classroomType: props.type,
-			deleted: false,
+			name: props.name,
+			prevName: props.name,
+			type: props.type,
 		}
 
 		this.handleChange = this.handleChange.bind(this)
@@ -18,28 +17,24 @@ export default class Classroom extends React.Component {
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, () => {
 			let knowledge = this.props.getKnowledge()
-			delete knowledge['classrooms'][this.state.prevNumber]
-			this.setState({prevNumber: this.state.classroomNumber})
-			knowledge['classrooms'][this.state.classroomNumber] = this.state.classroomType
+			knowledge['classrooms'] = knowledge['classrooms'].map(el => el.name === this.state.prevName ? {
+				name: this.state.name,
+				type: this.state.type,
+				id: el.id,
+			} : el)
+			this.setState({prevName: this.state.name})
 			this.props.setKnowledge(knowledge)
 		})
 	}
 
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
-		delete knowledge['classrooms'][this.state.classroomNumber]
+		knowledge['classrooms'] = knowledge['classrooms'].filter(el => el.name !== this.state.prevName)
 		this.props.setKnowledge(knowledge)
-		this.setState({
-			deleted: true,
-		})
-		// Чтобы страница не перезагружалась
 		event.preventDefault()
 	}
 
 	render() {
-		if (this.state.deleted) {
-			return ''
-		}
 		return (
 			<div className="uk-flex uk-flex-center uk-child-width-1-4 classroom-row">
 				<div>
@@ -47,9 +42,9 @@ export default class Classroom extends React.Component {
 						className="uk-input"
 						type="text"
 						placeholder="Номер аудитории"
-						value={this.state.classroomNumber}
+						value={this.state.name}
 						onChange={this.handleChange}
-						name="classroomNumber"
+						name="name"
 						autoComplete="off"
 					/>
 				</div>
@@ -58,8 +53,8 @@ export default class Classroom extends React.Component {
 					<select
 						className="uk-select"
 						onChange={this.handleChange}
-						value={this.state.classroomType}
-						name="classroomType"
+						value={this.state.type}
+						name="type"
 					>
 						<option value="lecture">Лекционная</option>
 						<option value="physical">Физическая</option>

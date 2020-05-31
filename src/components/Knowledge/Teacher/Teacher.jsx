@@ -5,11 +5,9 @@ export default class Teacher extends React.Component {
 	constructor(props) {
 		super(props)
 		this.state = {
-			teacherName: props.name,
+			name: props.name,
 			prevName: props.name,
-			teacherDisciplines: props.teacherDisciplines,
-			allDisciplines: this.props.disciplines,
-			deleted: false,
+			disciplines: props.disciplines,
 			showDiscipline: false,
 		}
 
@@ -29,37 +27,33 @@ export default class Teacher extends React.Component {
 
 	updateSelected(selected) {
 		this.setState({
-			teacherDisciplines: selected,
+			disciplines: selected,
 		}, this.updateKnowledge)
-	}
-
-	updateKnowledge() {
-		let knowledge = this.props.getKnowledge()
-		delete knowledge['teachers'][this.state.prevName]
-		this.setState({prevName: this.state.teacherName})
-		knowledge['teachers'][this.state.teacherName] = this.state.teacherDisciplines
-		this.props.setKnowledge(knowledge)
 	}
 
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, this.updateKnowledge)
 	}
 
+	updateKnowledge() {
+		let knowledge = this.props.getKnowledge()
+		knowledge['teachers'] = knowledge['teachers'].map(el => el.name === this.state.prevName ? {
+			name: this.state.name,
+			disciplines: this.state.disciplines,
+			id: el.id,
+		} : el)
+		this.props.setKnowledge(knowledge)
+		this.setState({prevName: this.state.name})
+	}
+
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
-		delete knowledge['teachers'][this.state.teacherName]
+		knowledge['teachers'] = knowledge['teachers'].filter(el => el.name !== this.state.name)
 		this.props.setKnowledge(knowledge)
-		this.setState({
-			deleted: true,
-		})
-		// Чтобы страница не перезагружалась
 		event.preventDefault()
 	}
 
 	render() {
-		if (this.state.deleted) {
-			return ''
-		}
 		return (
 			<div className="uk-flex uk-flex-column uk-flex-middle teachers-row">
 				<div className="uk-width-3-4 uk-flex uk-flex-center uk-child-width-1-4">
@@ -71,8 +65,8 @@ export default class Teacher extends React.Component {
 								placeholder="Введите ФИО преподавателя"
 								onChange={this.handleChange}
 								autoComplete="off"
-								value={this.state.teacherName}
-								name="teacherName"
+								value={this.state.name}
+								name="name"
 							/>
 						</label>
 					</div>
@@ -94,10 +88,10 @@ export default class Teacher extends React.Component {
 				<div className="uk-width-3-4 uk-flex uk-flex-center chooseDiscipline">
 					{this.state.showDiscipline &&
 					<ChooseDiscipline
-						disciplines={this.state.allDisciplines}
-						teacherDisciplines={this.state.teacherDisciplines}
+						name={this.state.name}
+						selected={this.state.disciplines}
 						updateSelected={this.updateSelected}
-						name={this.state.teacherName}
+						allDisciplines={this.props.allDisciplines}
 					/>
 					}
 				</div>

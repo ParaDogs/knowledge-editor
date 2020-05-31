@@ -28,12 +28,12 @@ export default class Time extends React.Component {
 
 	updateStartTime(newTime) {
 		this.startTime.current.setState({time: newTime})
-		this.setState({startTime: newTime})
+		this.setState({startTime: newTime, prevStartTime: newTime})
 	}
 
 	updateEndTime(newTime) {
 		this.endTime.current.setState({time: newTime})
-		this.setState({endTime: newTime})
+		this.setState({endTime: newTime, prevEndTime: newTime})
 	}
 
 	handleStartChange(value) {
@@ -42,8 +42,9 @@ export default class Time extends React.Component {
 			knowledge['times'] = knowledge['times'].map(el => el.startTime !== this.state.prevStartTime ? el : {
 				startTime: this.state.startTime,
 				endTime: this.state.endTime,
+				id: el.id,
 			})
-			this.props.setTimes(knowledge['times'])
+			this.setState({prevStartTime: this.state.startTime})
 			this.props.setKnowledge(knowledge)
 		})
 		const newEnd = moment(value, 'HH:mm').add(this.state.durationInMinutes, 'minutes')
@@ -51,7 +52,16 @@ export default class Time extends React.Component {
 	}
 
 	handleEndChange(value) {
-		this.setState({endTime: value})
+		this.setState({endTime: value}, () => {
+			let knowledge = this.props.getKnowledge()
+			knowledge['times'] = knowledge['times'].map(el => el.endTime !== this.state.prevEndTime ? el : {
+				startTime: this.state.startTime,
+				endTime: this.state.endTime,
+				id: el.id,
+			})
+			this.setState({prevEndTime: this.state.endTime})
+			this.props.setKnowledge(knowledge)
+		})
 		const newStart = moment(value, 'HH:mm').subtract(this.state.durationInMinutes, 'minutes')
 		this.updateStartTime(newStart.format('HH:mm'))
 	}
@@ -64,7 +74,6 @@ export default class Time extends React.Component {
 			}
 
 			knowledge['times'] = knowledge['times'].filter(el => el.startTime !== this.state.startTime)
-			this.props.setTimes(knowledge['times'])
 			this.props.setKnowledge(knowledge)
 
 			this.updateStartTime('')

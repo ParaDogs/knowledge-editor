@@ -1,6 +1,7 @@
 import React from "react"
 import TimeInput from 'react-time-input'
 import moment from "moment"
+import {v4 as uuid} from "uuid"
 
 export default class NewTime extends React.Component {
 	constructor(props) {
@@ -50,8 +51,7 @@ export default class NewTime extends React.Component {
 
 			// Don't make duplicates
 			if (!knowledge['times'].some(el => el.startTime === this.state.startTime)) {
-				knowledge['times'].push({startTime: this.state.startTime, endTime: this.state.endTime})
-				this.props.setTimes(knowledge['times'])
+				knowledge['times'].push({startTime: this.state.startTime, endTime: this.state.endTime, id: uuid()})
 				this.props.setKnowledge(knowledge)
 			}
 

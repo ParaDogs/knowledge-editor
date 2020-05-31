@@ -18,7 +18,8 @@
     "react-scripts": "3.4.1",
     "react-time-input": "0.0.19",
     "sync-scroll": "^1.0.3",
-    "uikit": "^3.4.6"
+    "uikit": "^3.4.6",
+    "uuid": "^8.1.0"
   },
   "scripts": {
     "start": "BROWSER=none react-scripts start",
