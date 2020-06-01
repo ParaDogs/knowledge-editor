@@ -1,5 +1,5 @@
 import React from "react"
-import {Route, Switch} from "react-router-dom"
+import {Redirect, Route, Switch} from "react-router-dom"
 import Classrooms from "./Classroom/Classrooms"
 import Disciplines from "./Discipline/Disciplines"
 import Groups from "./Group/Groups"
@@ -44,6 +44,7 @@ export default class Knowledge extends React.Component {
 				<div>
 					<form className="uk-flex uk-flex-center uk-flex-column tabContent">
 						<Switch>
+							<Redirect exact from="/knowledge" to="/knowledge/classrooms"/>
 							<Route path="/knowledge/classrooms">
 								<Classrooms
 									classrooms={this.state.knowledge.classrooms}
