@@ -7,7 +7,7 @@ export default class Days extends React.Component {
 		const teachersComponents = teachers?.map(el => <Teacher id={el.id}
 																key={el.id}
 																name={el.name}
-																days={this.props.getData()?.days.find(day => day.id === el.id)?.days}
+																days={this.props.getData().days?.find(day => day.id === el.id)?.days}
 																setData={this.props.setData}
 																getData={this.props.getData}
 																setKnowledge={this.props.setKnowledge}
