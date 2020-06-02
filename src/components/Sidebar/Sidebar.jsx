@@ -22,7 +22,7 @@ export default function Sidebar() {
 						<a href="#">Редактор данных</a>
 						<ul className="uk-nav-sub">
 							<li><Link to="/data/semester">Семестр</Link></li>
-							<li><Link to="/data/teachersDays">Дни преподавателей</Link></li>
+							<li><Link to="/data/days">Дни преподавателей</Link></li>
 						</ul>
 					</li>
 					<li className="uk-parent">

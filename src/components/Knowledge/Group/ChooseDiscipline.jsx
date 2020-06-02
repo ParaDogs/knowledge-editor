@@ -39,17 +39,15 @@ export default class ChooseDiscipline extends React.Component {
 
 	updateTimes() {
 		const times = document.getElementById(this.props.name)
-		console.log(this.state.selected)
 		let newTimes = this.state.selected.map(discipline => {
 			let keyTimeNode = times.children[this.state.selected.findIndex(el => discipline === el)]
-			console.log(discipline, keyTimeNode.value)
 			return keyTimeNode.value
 		})
 		this.setState({times: newTimes}, () => this.props.updateSelected(this.state.selected, this.state.times))
 	}
 
 	render() {
-		let selectTimeElements = this.state.selected.map((el, ind) => <ChooseTime
+		let selectTimeElements = this.state.selected?.map((el, ind) => <ChooseTime
 			key={el}
 			disciplineName={el}
 			updateTimes={this.updateTimes}
@@ -62,7 +60,7 @@ export default class ChooseDiscipline extends React.Component {
 			<React.Fragment>
 				<div className="uk-width-1-1" onMouseEnter={() => syncscroll.reset()}>
 					<DualListBox
-						options={allDisciplines}
+						options={allDisciplines || []}
 						selected={this.state.selected}
 						onChange={this.onChange}
 						selectedRef={c => {

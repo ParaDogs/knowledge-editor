@@ -40,7 +40,7 @@ export default class ChooseDiscipline extends React.Component {
 		return (
 			<div className="uk-width-1-1" onMouseEnter={() => syncscroll.reset()}>
 				<DualListBox
-					options={allDisciplines}
+					options={allDisciplines || []}
 					selected={this.state.selected}
 					onChange={this.onChange}
 					selectedRef={c => {
