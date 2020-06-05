@@ -7,6 +7,8 @@ import {
 	KeyboardDatePicker,
 } from '@material-ui/pickers'
 import "moment/locale/ru"
+import Snackbar from "@material-ui/core/Snackbar"
+import MuiAlert from '@material-ui/lab/Alert'
 
 export default class Semester extends React.Component {
 	constructor(props) {
@@ -18,33 +20,51 @@ export default class Semester extends React.Component {
 		this.state = {
 			start: moment(start),
 			end: moment(end),
+			showError: false,
 		}
 
 		this.handleStartDateChange = this.handleStartDateChange.bind(this)
 		this.handleEndDateChange = this.handleEndDateChange.bind(this)
 		this.updateStorage = this.updateStorage.bind(this)
+		this.handleSubmit = this.handleSubmit.bind(this)
+		this.handleCloseError = this.handleCloseError.bind(this)
 		moment.locale("ru")
 	}
 
 	handleStartDateChange(date) {
-		this.setState({start: date}, this.updateStorage)
+		this.setState({start: date})
 	}
 
 	handleEndDateChange(date) {
-		this.setState({end: date}, this.updateStorage)
+		this.setState({end: date})
+	}
+
+	handleSubmit(event) {
+		if (moment(this.state.start).isBefore(this.state.end)) {
+			this.updateStorage()
+		} else {
+			this.setState({showError: true}, () => console.log(this.state.showError))
+		}
+		event.preventDefault()
+	}
+
+	handleCloseError(event, reason) {
+		if (reason === 'clickaway') {
+			return
+		}
+		this.setState({showError: false})
 	}
 
 	updateStorage() {
 		let data = this.props.getData()
 		data['semester'] = {start: this.state.start, end: this.state.end}
-		console.log(data)
 		this.props.setData(data)
 	}
 
 	render() {
 		const invalidDateMessage = 'Дата введена неправильно'
 		return (
-			<div className="uk-flex uk-child-width-1-2 uk-flex-center semester">
+			<div className="uk-flex uk-child-width-1-2 uk-flex-center uk-flex-column uk-flex-middle semester">
 				<MuiPickersUtilsProvider utils={MomentUtils}>
 					<Grid container justify="space-around">
 						<KeyboardDatePicker
@@ -75,6 +95,15 @@ export default class Semester extends React.Component {
 						/>
 					</Grid>
 				</MuiPickersUtilsProvider>
+				<button className="uk-button uk-button-primary uk-width-auto uk-margin-top"
+						onClick={this.handleSubmit}>
+					Сохранить
+				</button>
+				<Snackbar open={this.state.showError} autoHideDuration={6000} onClose={this.handleCloseError}>
+					<MuiAlert onClose={this.handleCloseError} severity="error" elevation={6} variant="filled">
+						Дата начала семестра должна быть до даты конца семестра
+					</MuiAlert>
+				</Snackbar>
 			</div>
 		)
 	}
