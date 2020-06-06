@@ -8,16 +8,8 @@ export default class ChooseDiscipline extends React.Component {
 	constructor(props) {
 		super(props)
 
-		// Need to remove disciplines that was deleted
-		let onlyExistDisciplines = []
-		for (let i = 0; i < this.props.selected.length; i++) {
-			if (this.props.allDisciplines.some(el => el.id === this.props.selected[i])) {
-				onlyExistDisciplines.push(this.props.selected[i])
-			}
-		}
-
 		this.state = {
-			selected: onlyExistDisciplines || [],
+			selected: this.props.selected || [],
 		}
 
 		this.onChange = this.onChange.bind(this)

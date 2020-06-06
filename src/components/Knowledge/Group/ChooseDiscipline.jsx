@@ -9,18 +9,9 @@ export default class ChooseDiscipline extends React.Component {
 	constructor(props) {
 		super(props)
 
-		// Need to remove disciplines that was deleted
-		let onlyExistDisciplines = [], onlyExistTimes = []
-		for (let i = 0; i < this.props.selected.length; i++) {
-			if (this.props.allDisciplines.some(el => el.id === this.props.selected[i])) {
-				onlyExistDisciplines.push(this.props.selected[i])
-				onlyExistTimes.push(this.props.times[i])
-			}
-		}
-
 		this.state = {
-			selected: onlyExistDisciplines || [],
-			times: onlyExistTimes || [],
+			selected: this.props.selected || [],
+			times: this.props.times || [],
 		}
 
 		this.onChange = this.onChange.bind(this)

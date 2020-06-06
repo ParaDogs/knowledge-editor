@@ -30,6 +30,37 @@ export default class Disciplines extends React.Component {
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
 		knowledge['disciplines'] = knowledge['disciplines'].filter(el => el.name !== this.state.prevName)
+		// Delete discipline from groups disciplines
+		knowledge['groups'] = knowledge['groups']?.map(group => {
+			console.log(group.disciplines)
+			let onlyExistDisciplines = [], onlyExistTimes = []
+			for (let i = 0; i < group.disciplines.length; ++i) {
+				if (group.disciplines[i] !== this.props.id) {
+					onlyExistDisciplines.push(group.disciplines[i])
+					onlyExistTimes.push(group.times[i])
+				}
+			}
+			return {
+				name: group.name,
+				id: group.id,
+				disciplines: onlyExistDisciplines,
+				times: onlyExistTimes,
+			}
+		})
+		// Delete discipline from teachers disciplines
+		knowledge['teachers'] = knowledge['teachers']?.map(teacher => {
+			let onlyExistDisciplines = []
+			for (let i = 0; i < teacher.disciplines.length; ++i) {
+				if (teacher.disciplines[i] !== this.props.id) {
+					onlyExistDisciplines.push(teacher.disciplines[i])
+				}
+			}
+			return {
+				name: teacher.name,
+				id: teacher.id,
+				disciplines: onlyExistDisciplines,
+			}
+		})
 		this.props.setKnowledge(knowledge)
 		event.preventDefault()
 	}

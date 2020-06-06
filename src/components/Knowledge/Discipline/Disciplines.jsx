@@ -8,6 +8,7 @@ export default class Disciplines extends React.Component {
 			name={el.name}
 			type={el.type}
 			key={el.id}
+			id={el.id}
 			setKnowledge={this.props.setKnowledge}
 			getKnowledge={this.props.getKnowledge}
 		/>)
