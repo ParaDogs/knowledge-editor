@@ -1,5 +1,7 @@
 import React from "react"
 import {v4 as uuid} from 'uuid'
+import MuiAlert from "@material-ui/lab/Alert"
+import Snackbar from "@material-ui/core/Snackbar"
 
 export default class NewDiscipline extends React.Component {
 	constructor(props) {
@@ -7,10 +9,12 @@ export default class NewDiscipline extends React.Component {
 		this.state = {
 			name: '',
 			type: 'lecture',
+			showError: false,
 		}
 
 		this.handleChange = this.handleChange.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
+		this.handleCloseError = this.handleCloseError.bind(this)
 	}
 
 	handleChange(event) {
@@ -27,6 +31,8 @@ export default class NewDiscipline extends React.Component {
 			if (!knowledge['disciplines'].some(el => el.name === this.state.name)) {
 				knowledge['disciplines'].push({id: uuid(), name: this.state.name, type: this.state.type})
 				this.props.setKnowledge(knowledge)
+			} else {
+				this.setState({showError: true})
 			}
 
 			this.setState({
@@ -35,6 +41,13 @@ export default class NewDiscipline extends React.Component {
 			})
 		}
 		event.preventDefault()
+	}
+
+	handleCloseError(event, reason) {
+		if (reason === 'clickaway') {
+			return
+		}
+		this.setState({showError: false})
 	}
 
 	render() {
@@ -65,6 +78,11 @@ export default class NewDiscipline extends React.Component {
 
 				<button className="uk-button uk-button-primary uk-margin-left" onClick={this.handleSubmit}>Добавить
 				</button>
+				<Snackbar open={this.state.showError} autoHideDuration={6000} onClose={this.handleCloseError}>
+					<MuiAlert onClose={this.handleCloseError} severity="error" elevation={6} variant="filled">
+						Дисциплина с таким именем уже есть
+					</MuiAlert>
+				</Snackbar>
 			</div>
 		)
 	}
