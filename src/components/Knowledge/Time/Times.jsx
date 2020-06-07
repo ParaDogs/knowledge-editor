@@ -8,6 +8,7 @@ export default class Times extends React.Component {
 		let times = this.props.times?.sort((a, b) => a.startTime > b.startTime ? 1 : -1).map(el => (
 			<Time
 				key={el.id}
+				id={el.id}
 				endTime={el.endTime}
 				startTime={el.startTime}
 				setKnowledge={this.props.setKnowledge}
