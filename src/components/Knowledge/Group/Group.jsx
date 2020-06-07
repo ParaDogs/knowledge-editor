@@ -6,7 +6,6 @@ export default class Group extends React.Component {
 		super(props)
 		this.state = {
 			name: props.name,
-			prevName: props.name,
 			disciplines: props.disciplines,
 			times: props.times,
 			showDiscipline: false,
@@ -33,28 +32,32 @@ export default class Group extends React.Component {
 		this.setState({
 			disciplines: selected,
 			times: times,
-		}, this.updateKnowledge)
+		}, () => this.updateKnowledge(true))
 	}
 
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, this.updateKnowledge)
 	}
 
-	updateKnowledge() {
+	updateKnowledge(force) {
 		let knowledge = this.props.getKnowledge()
-		knowledge['groups'] = knowledge['groups'].map(el => el.name === this.state.prevName ? {
-			name: this.state.name,
-			disciplines: this.state.disciplines,
-			times: this.state.times,
-			id: el.id,
-		} : el)
-		this.props.setKnowledge(knowledge)
-		this.setState({prevName: this.state.name})
+		if (!knowledge['groups'].some(el => el.name === this.state.name) || force) {
+			this.props.showError(false)
+			knowledge['groups'] = knowledge['groups'].map(el => el.id === this.props.id ? {
+				name: this.state.name,
+				disciplines: this.state.disciplines,
+				times: this.state.times,
+				id: el.id,
+			} : el)
+			this.props.setKnowledge(knowledge)
+		} else {
+			this.props.showError(true)
+		}
 	}
 
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
-		knowledge['groups'] = knowledge['groups'].filter(el => el.name !== this.state.name)
+		knowledge['groups'] = knowledge['groups'].filter(el => el.id !== this.props.id)
 		this.props.setKnowledge(knowledge)
 		event.preventDefault()
 	}

@@ -6,7 +6,6 @@ export default class Classroom extends React.Component {
 		super(props)
 		this.state = {
 			name: props.name,
-			prevName: props.name,
 			type: props.type,
 		}
 
@@ -17,19 +16,23 @@ export default class Classroom extends React.Component {
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, () => {
 			let knowledge = this.props.getKnowledge()
-			knowledge['classrooms'] = knowledge['classrooms'].map(el => el.name === this.state.prevName ? {
-				name: this.state.name,
-				type: this.state.type,
-				id: el.id,
-			} : el)
-			this.setState({prevName: this.state.name})
-			this.props.setKnowledge(knowledge)
+			if (!knowledge['classrooms'].some(el => el.name === this.state.name)) {
+				this.props.showError(false)
+				knowledge['classrooms'] = knowledge['classrooms'].map(el => el.id === this.props.id ? {
+					name: this.state.name,
+					type: this.state.type,
+					id: el.id,
+				} : el)
+				this.props.setKnowledge(knowledge)
+			} else {
+				this.props.showError(true)
+			}
 		})
 	}
 
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
-		knowledge['classrooms'] = knowledge['classrooms'].filter(el => el.name !== this.state.prevName)
+		knowledge['classrooms'] = knowledge['classrooms'].filter(el => el.id !== this.props.id)
 		this.props.setKnowledge(knowledge)
 		event.preventDefault()
 	}

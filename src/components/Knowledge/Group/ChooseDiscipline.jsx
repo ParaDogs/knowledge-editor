@@ -21,7 +21,6 @@ export default class ChooseDiscipline extends React.Component {
 	componentDidMount() {
 		this.selectedRef.classList.add('syncscroll')
 		this.selectedRef.name = this.props.name
-		this.props.updateSelected(this.state.selected, this.state.times) // update deleted disciplines
 	}
 
 	onChange(selected) {

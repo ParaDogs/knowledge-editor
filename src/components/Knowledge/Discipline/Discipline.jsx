@@ -6,7 +6,6 @@ export default class Disciplines extends React.Component {
 		super(props)
 		this.state = {
 			name: props.name,
-			prevName: props.name,
 			type: props.type,
 		}
 
@@ -17,22 +16,25 @@ export default class Disciplines extends React.Component {
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, () => {
 			let knowledge = this.props.getKnowledge()
-			knowledge['disciplines'] = knowledge['disciplines'].map(el => el.name === this.state.prevName ? {
-				name: this.state.name,
-				type: this.state.type,
-				id: el.id,
-			} : el)
-			this.setState({prevName: this.state.name})
-			this.props.setKnowledge(knowledge)
+			if (!knowledge['disciplines'].some(el => el.name === this.state.name)) {
+				this.props.showError(false)
+				knowledge['disciplines'] = knowledge['disciplines'].map(el => el.id === this.props.id ? {
+					name: this.state.name,
+					type: this.state.type,
+					id: el.id,
+				} : el)
+				this.props.setKnowledge(knowledge)
+			} else {
+				this.props.showError(true)
+			}
 		})
 	}
 
 	handleSubmit(event) {
 		let knowledge = this.props.getKnowledge()
-		knowledge['disciplines'] = knowledge['disciplines'].filter(el => el.name !== this.state.prevName)
+		knowledge['disciplines'] = knowledge['disciplines'].filter(el => el.id !== this.props.id)
 		// Delete discipline from groups disciplines
 		knowledge['groups'] = knowledge['groups']?.map(group => {
-			console.log(group.disciplines)
 			let onlyExistDisciplines = [], onlyExistTimes = []
 			for (let i = 0; i < group.disciplines.length; ++i) {
 				if (group.disciplines[i] !== this.props.id) {
@@ -64,7 +66,6 @@ export default class Disciplines extends React.Component {
 		this.props.setKnowledge(knowledge)
 		event.preventDefault()
 	}
-
 
 	render() {
 		return (

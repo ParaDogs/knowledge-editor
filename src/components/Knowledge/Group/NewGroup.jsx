@@ -37,6 +37,7 @@ export default class NewGroup extends React.Component {
 				knowledge['groups'] = []
 			}
 			if (!knowledge['groups'].some(el => el.name === this.state.name)) {
+				this.props.showError(false)
 				knowledge['groups'].push({
 					id: uuid(),
 					name: this.state.name,
@@ -44,13 +45,14 @@ export default class NewGroup extends React.Component {
 					times: this.state.times,
 				})
 				this.props.setKnowledge(knowledge)
+				this.setState({
+					name: '',
+					disciplines: [],
+					times: [],
+				})
+			} else {
+				this.props.showError(true)
 			}
-
-			this.setState({
-				name: '',
-				disciplines: [],
-				times: [],
-			})
 		}
 		event.preventDefault()
 	}

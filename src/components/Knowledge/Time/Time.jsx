@@ -1,8 +1,6 @@
 import React from "react"
 import TimeInput from 'react-time-input'
 import moment from "moment"
-import MuiAlert from "@material-ui/lab/Alert"
-import Snackbar from "@material-ui/core/Snackbar"
 
 export default class Time extends React.Component {
 	constructor(props) {
@@ -12,24 +10,15 @@ export default class Time extends React.Component {
 			endTime: this.props.endTime,
 			durationInMinutes: 90,
 			edited: false,
-			showError: false,
 		}
 		this.startTime = React.createRef()
 		this.endTime = React.createRef()
 		this.handleStartChange = this.handleStartChange.bind(this)
-		this.handleCloseError = this.handleCloseError.bind(this)
 		this.handleEndChange = this.handleEndChange.bind(this)
 		this.updateStartTime = this.updateStartTime.bind(this)
 		this.updateEndTime = this.updateEndTime.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleSave = this.handleSave.bind(this)
-	}
-
-	handleCloseError(event, reason) {
-		if (reason === 'clickaway') {
-			return
-		}
-		this.setState({showError: false})
 	}
 
 	componentDidMount() {
@@ -68,9 +57,6 @@ export default class Time extends React.Component {
 
 			knowledge['times'] = knowledge['times'].filter(el => el.id !== this.props.id)
 			this.props.setKnowledge(knowledge)
-
-			this.updateStartTime('')
-			this.updateEndTime('')
 		}
 		event.preventDefault()
 	}
@@ -78,12 +64,14 @@ export default class Time extends React.Component {
 	handleSave(event) {
 		event.preventDefault()
 		let knowledge = this.props.getKnowledge()
+		this.props.showError(false)
 		// Check that times don't intersect
 		const format = 'HH:mm'
 		for (const time of knowledge['times']) {
+			if (time.id === this.props.id) continue
 			const compare = [moment(time.startTime, format), moment(time.endTime, format), undefined, '[]']
 			if (moment(this.state.startTime, format).isBetween(...compare) || moment(this.state.endTime, format).isBetween(...compare)) {
-				this.setState({showError: true})
+				this.props.showError(true)
 				return
 			}
 		}
@@ -123,11 +111,6 @@ export default class Time extends React.Component {
 					onClick={this.handleSubmit}>
 					Удалить
 				</button>
-				<Snackbar open={this.state.showError} autoHideDuration={6000} onClose={this.handleCloseError}>
-					<MuiAlert onClose={this.handleCloseError} severity="error" elevation={6} variant="filled">
-						Пары не могут пересекаться
-					</MuiAlert>
-				</Snackbar>
 			</div>
 		)
 	}
