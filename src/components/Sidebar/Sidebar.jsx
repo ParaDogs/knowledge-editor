@@ -30,7 +30,7 @@ export default function Sidebar() {
 						<a href="#">Решатель задач</a>
 						<ul className="uk-nav-sub">
 							{/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-							<li><a href="#">Составить расписание</a></li>
+							<li><Link to="/solver">Составить расписание</Link></li>
 						</ul>
 					</li>
 				</ul>

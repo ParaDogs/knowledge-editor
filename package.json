@@ -11,6 +11,8 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "jquery": "^3.5.1",
+    "jquery-sked-tape": "^2.4.6",
     "moment": "^2.26.0",
     "multi.js": "^0.5.1",
     "node-sass": "^4.14.1",
