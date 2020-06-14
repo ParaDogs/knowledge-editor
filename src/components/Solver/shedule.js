@@ -156,7 +156,7 @@ function is_correct_hours(schedule, NUM_WEEKS_IN_SEMESTER) {
 }
 
 // предрасписание - это кусок будущего корректного расписания, где не учитываются часы на дисциплины
-async function get_preschedule(preschedule, lessons, num_lesson) {
+function get_preschedule(preschedule, lessons, num_lesson) {
 	if (lessons.length > num_lesson + 1) {
 		if (is_correct_schedule([...preschedule, lessons[num_lesson]])) {
 			return get_preschedule([...preschedule, lessons[num_lesson]], lessons, num_lesson + 1)
@@ -168,17 +168,15 @@ async function get_preschedule(preschedule, lessons, num_lesson) {
 	}
 }
 
-export async function get_correct_schedules(NUM_WEEKS_IN_SEMESTER) {
-	console.log('start')
+function get_correct_schedules(NUM_WEEKS_IN_SEMESTER) {
 	let lessons = get_lessons()
 	let correct_schedules = []
 	for (let i = 0; i < lessons.length; i++) {
-		let preschedule = await get_preschedule([], lessons, i)
+		let preschedule = get_preschedule([], lessons, i)
 		if (is_correct_hours(preschedule, NUM_WEEKS_IN_SEMESTER)) {
 			correct_schedules.push(preschedule)
 			// хз как выводить при этом ошибки (формировать объяснения, почему не сформировано расписание)
 		}
 	}
-	console.log('Done')
 	return correct_schedules
 }
