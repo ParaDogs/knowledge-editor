@@ -6,6 +6,7 @@ export default class ChooseDays extends React.Component {
 	render() {
 		moment.locale("ru")
 		let weekdays = moment.weekdays(true)
+			.slice(0, -1)
 			.map(string => string.charAt(0).toUpperCase() + string.slice(1))
 			.map(el => ({value: el, label: el}))
 		return (

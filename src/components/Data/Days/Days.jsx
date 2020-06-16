@@ -3,7 +3,6 @@ import Teacher from "./Teacher"
 
 export default class Days extends React.Component {
 	render() {
-		// TODO удаление преподавателей нужно отловить
 		const teachers = this.props.getKnowledge().teachers
 		const teachersComponents = teachers?.map(el => <Teacher id={el.id}
 																key={el.id}

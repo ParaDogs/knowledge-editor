@@ -16,7 +16,7 @@ export default class Solver extends React.Component {
 		if (data == null) {
 			data = {}
 		}
-		this.state = {knowledge, data}
+		this.state = {knowledge, data, schedule: []}
 	}
 
 	componentDidMount() {
@@ -26,38 +26,69 @@ export default class Solver extends React.Component {
 		// 	console.log(event)
 		// })
 		// const {knowledge, data} = this.state
-		// let s = moment(this.state.data.semester.start)
-		// let e = moment(this.state.data.semester.end)
-		// let NUM_WEEKS_IN_SEMESTER = moment.duration(e.diff(s)).asWeeks()
 		// this.worker.postMessage({knowledge, data, NUM_WEEKS_IN_SEMESTER})
-
-	}
-
-	render() {
 		const duration = 90
-		const {groups} = this.state.knowledge
-		const tasks = []
+		const groups = this.state.knowledge.groups
+
+		const generateTeacherForGroupsDiscipline = function* (teachers) {
+			console.log('generateTeacherForGroupsDiscipline', teachers)
+			let teacherNumber = 0
+			while (true) {
+				yield teachers[teacherNumber]
+				teacherNumber = (teacherNumber + 1) % teachers.length
+			}
+		}
+		let tasks = []
+		let disciplineTeachers = {} // содержит функции выдающие следующего пеподавателя по всем типам
+		let teachersDiscipline = {} // содержит все дисциплиныы преподавателей
+		for (const teacher of this.state.knowledge.teachers) {
+			teachersDiscipline[teacher.id] = []
+		}
 		groups.forEach(group => {
+			console.log('group', group)
 			const {disciplines, times} = group
+			const groupTasks = []
 			for (let i = 0; i < disciplines.length; i++) {
-				// Добавляет столько пар сколько часов указано пополам
-				// const numberOfLessons = Math.floor(times / 2)
-				const numberOfLessons = 4
+				// Количество пар в две недели
+				let s = moment(this.state.data.semester.start)
+				let e = moment(this.state.data.semester.end)
+				let NUM_WEEKS_IN_SEMESTER = moment.duration(e.diff(s)).asWeeks()
+				let numberOfLessons = Math.floor(times[i] / 2)
+				numberOfLessons = Math.floor(numberOfLessons / NUM_WEEKS_IN_SEMESTER) * 2
+				numberOfLessons = numberOfLessons === 0 ? 1 : numberOfLessons
 				const disciplineType = this.state.knowledge.disciplines.find(el => el.id === disciplines[i]).type
 				const disciplineTypeClassrooms = this.state.knowledge.classrooms.filter(el => el.type === disciplineType).map(el => el.id)
+				// Выбираем преподавателя
 				const disciplineTypeTeachers = this.state.knowledge.teachers.filter(el => el.disciplines.includes(disciplines[i])).map(el => el.id)
+				console.log('disciplineTypeTeachers', disciplineTypeTeachers)
+				console.log('disciplineTeachers[disciplineType], disciplineTeachers[disciplineType]')
+				if (!disciplineTeachers[disciplines[i]]) {
+					disciplineTeachers[disciplines[i]] = generateTeacherForGroupsDiscipline(disciplineTypeTeachers)
+				}
+				let disciplineTeacher = disciplineTeachers[disciplines[i]].next().value
 				for (let j = 0; j < numberOfLessons; j++) {
+					let dependency = []
+					let groupDependency = groupTasks.slice(-1)[0]
+					dependency = groupDependency ? [...dependency, groupDependency.id] : dependency
+					let teacherDependency = teachersDiscipline[disciplineTeacher].slice(-1)[0]
+					dependency = teacherDependency ? [...dependency, teacherDependency.id] : dependency
 					let newTask = {
-						id: uuid(),
+						id: `${j}:${group.name}:${disciplines[i]}:${disciplineTeacher}`,
 						duration: duration,
 						minLength: duration,
-						resources: [disciplineTypeClassrooms, group.id, disciplineTypeTeachers],
+						resources: [disciplineTypeClassrooms, group.id, disciplineTeacher, disciplines[i]],
+						dependsOn: dependency,
 					}
-					tasks.push(newTask)
+					teachersDiscipline[disciplineTeacher].push(newTask)
+					console.log('teachersDiscipline', teachersDiscipline)
+					console.log('newTask', newTask)
+					groupTasks.push(newTask)
 				}
 			}
+			tasks = [...tasks, ...groupTasks]
 		})
-
+		console.log('disciplineTeachers', disciplineTeachers)
+		// Задачи только во вемя пар
 		const availableTimeOfLessons = {schedules: []}
 		for (const time of this.state.knowledge.times) {
 			const format = 'HH:mm'
@@ -69,13 +100,16 @@ export default class Solver extends React.Component {
 			})
 		}
 
+		const disciplineResources = this.state.knowledge.disciplines.map(el => ({
+			...el,
+			isNotReservable: true,
+		}))
 		const classroomResources = this.state.knowledge.classrooms.map(el => ({
 			...el,
 			available: availableTimeOfLessons,
 		}))
 		const groupResources = this.state.knowledge.groups.map(el => ({
 			...el,
-			available: availableTimeOfLessons,
 		}))
 		const teacherResources = this.state.knowledge.teachers.map(teacher => {
 			const localeData = moment.localeData()
@@ -83,22 +117,28 @@ export default class Solver extends React.Component {
 			return {
 				...teacher,
 				available: later.parse.recur().on(...availableDayOfWeeks).dayOfWeek(),
+				isNotReservable: false,
 			}
 		})
-		const resources = [...classroomResources, ...groupResources, ...teacherResources]
+		const resources = [...classroomResources, ...groupResources, ...teacherResources, disciplineResources]
 
 		schedule.date.localTime()
 		const startDay = moment(this.state.data.semester.start).toDate()
-		const semesterAvailableDays = later.parse.recur().on(2, 3, 4, 5, 6, 7).dayOfWeek()
-		let sch = schedule.create(tasks, resources, semesterAvailableDays, startDay)
+		console.log('tasks', tasks)
+		console.log('start')
+		let sch = schedule.create(tasks, resources, undefined, startDay)
 		console.log(sch)
+		this.setState({schedule: sch})
 
+	}
+
+	render() {
 		return (
 			<div className="uk-width-expand">
 				<div className="uk-flex uk-flex-center uk-flex-column tabContent">
 					<Schedule knowledge={this.state.knowledge}
 							  data={this.state.data}
-							  schedule={sch}/>
+							  schedule={this.state.schedule}/>
 				</div>
 			</div>
 		)

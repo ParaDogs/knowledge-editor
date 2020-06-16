@@ -1,5 +1,6 @@
 import React from "react"
 import ChooseDays from "./ChooseDays"
+import moment from "moment"
 
 export default class Teacher extends React.Component {
 	constructor(props) {
@@ -22,6 +23,18 @@ export default class Teacher extends React.Component {
 	}
 
 	updateSelected(selected) {
+		let weekdays = moment.weekdays(true)
+			.slice(0, -1)
+			.map(string => string.charAt(0).toUpperCase() + string.slice(1))
+		selected.sort((a, b) => {
+			if (weekdays.indexOf(a) > weekdays.indexOf(b)) {
+				return 1
+			} else {
+				return -1
+			}
+		})
+		console.log('weekdays', weekdays)
+		console.log('selected', selected)
 		this.setState({
 			days: selected,
 		}, this.updateStorage)
