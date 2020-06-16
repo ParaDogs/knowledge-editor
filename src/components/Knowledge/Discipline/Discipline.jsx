@@ -16,7 +16,7 @@ export default class Disciplines extends React.Component {
 	handleChange(event) {
 		this.setState({[event.target.name]: event.target.value}, () => {
 			let knowledge = this.props.getKnowledge()
-			if (!knowledge['disciplines'].some(el => el.name === this.state.name)) {
+			if (!knowledge['disciplines'].some(el => el.name === this.state.name && el.id !== this.props.id)) {
 				this.props.showError(false)
 				knowledge['disciplines'] = knowledge['disciplines'].map(el => el.id === this.props.id ? {
 					name: this.state.name,

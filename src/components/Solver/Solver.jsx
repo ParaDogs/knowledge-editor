@@ -52,9 +52,21 @@ export default class Solver extends React.Component {
 				let s = moment(this.state.data.semester.start)
 				let e = moment(this.state.data.semester.end)
 				let NUM_WEEKS_IN_SEMESTER = moment.duration(e.diff(s)).asWeeks()
-				let numberOfLessons = Math.floor(times[i] / 4)
-				numberOfLessons = Math.floor(numberOfLessons / NUM_WEEKS_IN_SEMESTER) * 2
-				numberOfLessons = numberOfLessons === 0 ? 1 : numberOfLessons
+				let numberOfLessons = 1
+				switch (parseInt(times[i], 10)) {
+					case 36:
+						numberOfLessons = 1
+						break
+					case 72:
+						numberOfLessons = 2
+						break
+					case 108:
+						numberOfLessons = 3
+						break
+					case 144:
+						numberOfLessons = 4
+						break
+				}
 				console.log('NUM_WEEKS_IN_SEMESTER', numberOfLessons)
 				const disciplineType = this.state.knowledge.disciplines.find(el => el.id === disciplines[i]).type
 				const disciplineTypeClassrooms = this.state.knowledge.classrooms.filter(el => el.type === disciplineType).map(el => el.id)
