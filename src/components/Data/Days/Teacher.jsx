@@ -22,10 +22,14 @@ export default class Teacher extends React.Component {
 		event.preventDefault()
 	}
 
-	updateSelected(selected) {
-		let weekdays = moment.weekdays(true)
+	static getDefaultDays = () => {
+		return moment.weekdays(true)
 			.slice(0, -1)
 			.map(string => string.charAt(0).toUpperCase() + string.slice(1))
+	}
+
+	updateSelected(selected) {
+		let weekdays = Teacher.getDefaultDays()
 		selected.sort((a, b) => {
 			if (weekdays.indexOf(a) > weekdays.indexOf(b)) {
 				return 1

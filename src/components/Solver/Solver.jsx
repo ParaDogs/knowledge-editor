@@ -3,6 +3,8 @@ import Schedule from "./Schedule"
 import later from 'later'
 import schedule from 'schedulejs'
 import * as moment from "moment"
+import Teacher from "../Data/Days/Teacher"
+import Semester from "../Data/Semester/Semester"
 
 export default class Solver extends React.Component {
 	constructor(props) {
@@ -15,10 +17,21 @@ export default class Solver extends React.Component {
 		if (data == null) {
 			data = {}
 		}
-		this.state = {knowledge, data, schedule: []}
+		if (data.semester === undefined) {
+			data.semester = Semester.getDefaultSemester(data)
+		}
+		let valid = JSON.parse(localStorage.getItem('knowledgeValid'))
+		this.state = {knowledge, data, schedule: [], valid}
+		this.generateSchedule = this.generateSchedule.bind(this)
 	}
 
 	componentDidMount() {
+		if (this.state.valid) {
+			this.generateSchedule()
+		}
+	}
+
+	generateSchedule() {
 		// const schedule = require('schedulejs/schedule.js')
 		// this.worker = new WebWorkerSetup(worker)
 		// this.worker.addEventListener("message", event => {
@@ -125,15 +138,19 @@ export default class Solver extends React.Component {
 		}))
 		const teacherResources = this.state.knowledge.teachers.map(teacher => {
 			const localeData = moment.localeData()
-			const availableDayOfWeeks = this.state.data.days.find(el => el.id === teacher.id).days.map(el => localeData.weekdaysParse(el)).map(el => el + 1)
+			let availableDayOfWeeks = this.state.data.days?.find(el => el.id === teacher.id).days.map(el => localeData.weekdaysParse(el)).map(el => el + 1)
+			if (availableDayOfWeeks === undefined) {
+				availableDayOfWeeks = Teacher.getDefaultDays().map(el => localeData.weekdaysParse(el)).map(el => el + 1)
+			}
+			console.log('availableDayOfWeeks', availableDayOfWeeks)
 			return {
 				...teacher,
 				available: later.parse.recur().on(...availableDayOfWeeks).dayOfWeek(),
 				isNotReservable: false,
 			}
 		})
-		const resources = [...classroomResources, ...groupResources, ...teacherResources, disciplineResources]
-
+		const resources = [...classroomResources, ...groupResources, ...teacherResources, ...disciplineResources]
+		console.log(resources)
 		schedule.date.localTime()
 		const startDay = moment(this.state.data.semester.start).toDate()
 		console.log('tasks', tasks)
@@ -141,16 +158,18 @@ export default class Solver extends React.Component {
 		let sch = schedule.create(tasks, resources, undefined, startDay)
 		console.log(sch)
 		this.setState({schedule: sch})
-
 	}
 
 	render() {
 		return (
 			<div className="uk-width-expand">
 				<div className="uk-flex uk-flex-center uk-flex-column tabContent">
-					<Schedule knowledge={this.state.knowledge}
-							  data={this.state.data}
-							  schedule={this.state.schedule}/>
+					{this.state.valid ?
+						<Schedule knowledge={this.state.knowledge}
+								  data={this.state.data}
+								  schedule={this.state.schedule}/>
+						: <span>Сначала необходимо проверить полноту</span>
+					}
 				</div>
 			</div>
 		)

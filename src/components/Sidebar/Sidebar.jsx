@@ -15,6 +15,7 @@ export default function Sidebar() {
 							<li><Link to="/knowledge/groups">Группы</Link></li>
 							<li><Link to="/knowledge/teachers">Преподаватели</Link></li>
 							<li><Link to="/knowledge/times">Время занятий</Link></li>
+							<li><Link to="/knowledge/check">Проверка полноты</Link></li>
 						</ul>
 					</li>
 					<li className="uk-parent">

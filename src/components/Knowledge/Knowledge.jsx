@@ -5,6 +5,7 @@ import Disciplines from "./Discipline/Disciplines"
 import Groups from "./Group/Groups"
 import Teachers from "./Teacher/Teachers"
 import Times from "./Time/Times"
+import Check from "./Check/Check"
 
 export default class Knowledge extends React.Component {
 	constructor(props) {
@@ -20,6 +21,7 @@ export default class Knowledge extends React.Component {
 
 		this.setKnowledge = this.setKnowledge.bind(this)
 		this.getKnowledge = this.getKnowledge.bind(this)
+		this.validate = this.validate.bind(this)
 	}
 
 	componentDidMount() {
@@ -38,6 +40,11 @@ export default class Knowledge extends React.Component {
 		localStorage.setItem('knowledge', stringKnowledge)
 	}
 
+	validate(valid) {
+		const stringValid = JSON.stringify(valid)
+		localStorage.setItem('knowledgeValid', stringValid)
+	}
+
 	render() {
 		return (
 			<div className="uk-width-expand">
@@ -46,41 +53,36 @@ export default class Knowledge extends React.Component {
 						<Switch>
 							<Redirect exact from="/knowledge" to="/knowledge/classrooms"/>
 							<Route path="/knowledge/classrooms">
-								<Classrooms
-									classrooms={this.state.knowledge.classrooms}
-									setKnowledge={this.setKnowledge}
-									getKnowledge={this.getKnowledge}
-								/>
+								<Classrooms classrooms={this.state.knowledge.classrooms}
+											setKnowledge={this.setKnowledge}
+											getKnowledge={this.getKnowledge}/>
 							</Route>
 							<Route path="/knowledge/disciplines">
-								<Disciplines
-									disciplines={this.state.knowledge.disciplines}
-									setKnowledge={this.setKnowledge}
-									getKnowledge={this.getKnowledge}
-								/>
+								<Disciplines disciplines={this.state.knowledge.disciplines}
+											 setKnowledge={this.setKnowledge}
+											 getKnowledge={this.getKnowledge}/>
 							</Route>
 							<Route path="/knowledge/groups">
-								<Groups
-									groups={this.state.knowledge.groups}
-									disciplines={this.state.knowledge.disciplines}
-									setKnowledge={this.setKnowledge}
-									getKnowledge={this.getKnowledge}
-								/>
+								<Groups groups={this.state.knowledge.groups}
+										disciplines={this.state.knowledge.disciplines}
+										setKnowledge={this.setKnowledge}
+										getKnowledge={this.getKnowledge}/>
 							</Route>
 							<Route path="/knowledge/teachers">
-								<Teachers
-									teachers={this.state.knowledge.teachers}
-									disciplines={this.state.knowledge.disciplines}
-									setKnowledge={this.setKnowledge}
-									getKnowledge={this.getKnowledge}
-								/>
+								<Teachers teachers={this.state.knowledge.teachers}
+										  disciplines={this.state.knowledge.disciplines}
+										  setKnowledge={this.setKnowledge}
+										  getKnowledge={this.getKnowledge}/>
 							</Route>
 							<Route path="/knowledge/times">
-								<Times
-									times={this.state.knowledge.times}
-									setKnowledge={this.setKnowledge}
-									getKnowledge={this.getKnowledge}
-								/>
+								<Times times={this.state.knowledge.times}
+									   setKnowledge={this.setKnowledge}
+									   getKnowledge={this.getKnowledge}/>
+							</Route>
+							<Route path="/knowledge/check">
+								<Check getKnowledge={this.getKnowledge}
+									   validate={this.validate}
+									   setKnowledge={this.setKnowledge}/>
 							</Route>
 						</Switch>
 					</form>

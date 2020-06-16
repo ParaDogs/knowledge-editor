@@ -14,12 +14,19 @@ export default class Semester extends React.Component {
 	constructor(props) {
 		super(props)
 		const data = this.props.getData()
-		const start = data?.semester?.start
-		const end = data?.semester?.end
+		let start, end
+		if (data.semester?.start === undefined) {
+			const defaultSemester = Semester.getDefaultSemester(data)
+			start = defaultSemester.start
+			end = defaultSemester.end
+		} else {
+			start = moment(data.semester.start)
+			end = moment(data.semester.end)
+		}
 
 		this.state = {
-			start: moment(start),
-			end: moment(end),
+			start: start,
+			end: end,
 			showError: false,
 		}
 
@@ -29,6 +36,12 @@ export default class Semester extends React.Component {
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleCloseError = this.handleCloseError.bind(this)
 		moment.locale("ru")
+	}
+
+	static getDefaultSemester = data => {
+		const start = moment(data.semester?.start)
+		const end = data.semester?.end ? moment(data.semester?.end) : start.clone().add(18, 'weeks')
+		return {start: start.toDate(), end: end.toDate()}
 	}
 
 	handleStartDateChange(date) {
