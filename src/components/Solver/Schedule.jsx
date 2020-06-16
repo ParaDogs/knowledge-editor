@@ -39,8 +39,8 @@ export default class Schedule extends React.Component {
 					}}
 				>
 					{itemContext.title.discipline.name}<br/>
-					{itemContext.title.teacher.name}<br/>
-					{itemContext.title.classroom.name}<br/>
+					Преподаватель: {itemContext.title.teacher.name}<br/>
+					Аудитория № {itemContext.title.classroom.name}<br/>
 				</div>
 			</div>
 		)
@@ -61,7 +61,7 @@ export default class Schedule extends React.Component {
 			...el,
 			height: 60,
 		}))
-		const items = Object.values(this.props.schedule.scheduledTasks || {}).map((el, ind) => {
+		const firstItems = Object.values(this.props.schedule.scheduledTasks || {}).map((el, ind) => {
 			console.log('el', el)
 			let schedule = el.schedule[0]
 			let obj = {
@@ -73,7 +73,26 @@ export default class Schedule extends React.Component {
 			}
 			return obj
 		})
-
+		const items = []
+		console.log('firstItems', firstItems)
+		firstItems.forEach(el => {
+			items.push(el)
+			let nextItem = {
+				start_time: moment(el.start_time).add(2, 'weeks'),
+				end_time: moment(el.end_time).add(2, 'weeks'),
+			}
+			while (nextItem.start_time.isBefore(this.props.data.semester.end)) {
+				items.push({
+					...el,
+					id: uuid(),
+					start_time: nextItem.start_time.toDate(),
+					end_time: nextItem.end_time.toDate(),
+				})
+				nextItem.start_time.add(2, 'weeks')
+				nextItem.end_time.add(2, 'weeks')
+			}
+		})
+		console.log('items', items)
 		return (
 			<div>
 				<Timeline keys={keys}

@@ -32,11 +32,11 @@ export default class Semester extends React.Component {
 	}
 
 	handleStartDateChange(date) {
-		this.setState({start: date})
+		this.setState({start: date, end: moment(date).add(18, 'weeks')})
 	}
 
 	handleEndDateChange(date) {
-		this.setState({end: date})
+		this.setState({end: date, start: moment(date).subtract(18, 'weeks')})
 	}
 
 	handleSubmit(event) {

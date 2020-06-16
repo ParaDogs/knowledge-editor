@@ -3,7 +3,6 @@ import Schedule from "./Schedule"
 import later from 'later'
 import schedule from 'schedulejs'
 import * as moment from "moment"
-import {v4 as uuid} from 'uuid'
 
 export default class Solver extends React.Component {
 	constructor(props) {
@@ -53,9 +52,10 @@ export default class Solver extends React.Component {
 				let s = moment(this.state.data.semester.start)
 				let e = moment(this.state.data.semester.end)
 				let NUM_WEEKS_IN_SEMESTER = moment.duration(e.diff(s)).asWeeks()
-				let numberOfLessons = Math.floor(times[i] / 2)
+				let numberOfLessons = Math.floor(times[i] / 4)
 				numberOfLessons = Math.floor(numberOfLessons / NUM_WEEKS_IN_SEMESTER) * 2
 				numberOfLessons = numberOfLessons === 0 ? 1 : numberOfLessons
+				console.log('NUM_WEEKS_IN_SEMESTER', numberOfLessons)
 				const disciplineType = this.state.knowledge.disciplines.find(el => el.id === disciplines[i]).type
 				const disciplineTypeClassrooms = this.state.knowledge.classrooms.filter(el => el.type === disciplineType).map(el => el.id)
 				// Выбираем преподавателя
