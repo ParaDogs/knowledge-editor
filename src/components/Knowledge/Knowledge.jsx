@@ -38,6 +38,7 @@ export default class Knowledge extends React.Component {
 		})
 		const stringKnowledge = JSON.stringify(newKnowledge)
 		localStorage.setItem('knowledge', stringKnowledge)
+		this.validate(false)
 	}
 
 	validate(valid) {
