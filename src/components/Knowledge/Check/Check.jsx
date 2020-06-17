@@ -9,7 +9,7 @@ export default class Check extends React.Component {
 		const validDisciplines = this.checkDisciplines(disciplines)
 		const validGroups = this.checkGroups(groups)
 		const validTimes = this.checkTimes(times)
-		const validTeachers = this.checkTeachers(teachers)
+		const validTeachers = this.checkTeachers(teachers, disciplines)
 		const invalidArray = [validClassrooms, validDisciplines, validGroups, validTimes, validTeachers].filter(el => {
 			console.log('el', el)
 			return el.value === false
@@ -92,17 +92,24 @@ export default class Check extends React.Component {
 		}
 	}
 
-	checkTeachers = teachers => {
+	checkTeachers = (teachers, disciplines) => {
 		const isEmpty = teachers.length === 0
 		const hasDisciplines = teachers.reduce((accum, teacher) => accum && teacher.disciplines.length !== 0, true)
+		const teachersDisciplines = [...(new Set(teachers.map(teacher => teacher.disciplines).flat()))]
+		console.log('teachersDisciplines', teachersDisciplines)
+		const disciplinesWithoutTeachers = disciplines.filter(discipline => !teachersDisciplines.includes(discipline.id))
+		console.log('disciplinesWithoutTeachers', disciplinesWithoutTeachers)
+		const hasTeachers = disciplinesWithoutTeachers.length === 0
 		let result = {
-			value: !isEmpty && hasDisciplines,
+			value: !isEmpty && hasDisciplines && hasTeachers,
 			cause: '',
 		}
 		if (isEmpty) {
 			result.cause = 'Преподаватели'
 		} else if (!hasDisciplines) {
 			result.cause = `Дисциплины преподавателя ${teachers.find(teacher => teacher.disciplines.length === 0).name}`
+		} else if (!hasTeachers) {
+			result.cause = `Преподаватель для дисциплины ${disciplinesWithoutTeachers[0].name}`
 		}
 		return result
 	}
