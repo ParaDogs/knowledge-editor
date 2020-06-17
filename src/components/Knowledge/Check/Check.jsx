@@ -4,30 +4,63 @@ export default class Check extends React.Component {
 	constructor(props) {
 		super(props)
 		const knowledge = this.props.getKnowledge()
-		const {classrooms = [], disciplines, groups, times, teachers} = knowledge
-		const validClassrooms = this.checkClassrooms(classrooms)
-		const validDisciplines = this.checkDisciplines(disciplines || [])
-		const validGroups = this.checkGroups(groups || [])
-		const validTimes = this.checkTimes(times || [])
-		const validTeachers = this.checkTeachers(teachers || [])
-		const valids = [validClassrooms, validDisciplines, validGroups, validTimes, validTeachers].filter(el => {
+		const {classrooms = [], disciplines = [], groups = [], times = [], teachers = []} = knowledge
+		const validClassrooms = this.checkClassrooms(classrooms, disciplines)
+		const validDisciplines = this.checkDisciplines(disciplines)
+		const validGroups = this.checkGroups(groups)
+		const validTimes = this.checkTimes(times)
+		const validTeachers = this.checkTeachers(teachers)
+		const invalidArray = [validClassrooms, validDisciplines, validGroups, validTimes, validTeachers].filter(el => {
 			console.log('el', el)
 			return el.value === false
 		})
-		console.log('valids', valids)
-		if (valids.length === 0) {
+		console.log('invalidArray', invalidArray)
+		if (invalidArray.length === 0) {
 			this.props.validate(true)
 		}
 		this.state = {
-			validTeachers, validTimes, validGroups, validClassrooms, validDisciplines, valids,
+			validTeachers, validTimes, validGroups, validClassrooms, validDisciplines, invalidArray,
 		}
 	}
 
-	checkClassrooms = classrooms => {
-		return {
-			value: classrooms.length !== 0,
-			cause: 'Аудитории',
+	checkClassrooms = (classrooms, disciplines) => {
+		const isEmpty = classrooms.length === 0
+		const classroomsTypes = new Set(classrooms.map(el => el.type))
+		const disciplinesTypes = new Set(disciplines.map(el => el.type))
+		let necessaryType = null
+		for (const value of [...disciplinesTypes]) {
+			if (!classroomsTypes.has(value)) {
+				necessaryType = value
+				break
+			}
 		}
+		let result = {
+			value: !isEmpty && necessaryType === null,
+			cause: '',
+		}
+		if (isEmpty) {
+			result.cause = 'Аудитории'
+		} else if (necessaryType !== null) {
+			let typeName = null
+			switch (necessaryType) {
+				case 'lecture':
+					typeName = 'лекционная'
+					break
+				case 'chemical':
+					typeName = 'химическая'
+					break
+				case 'computer':
+					typeName = 'комьютерная'
+					break
+				case 'physical':
+					typeName = 'физическая'
+					break
+				default:
+					typeName = 'необходимая'
+			}
+			result.cause = `Для проведения занятий нужна ${typeName} аудитория`
+		}
+		return result
 	}
 
 	checkDisciplines = disciplines => {
@@ -112,11 +145,11 @@ export default class Check extends React.Component {
 					</tr>
 					</tbody>
 				</table>
-				{this.state.valids.length !== 0 &&
+				{this.state.invalidArray.length !== 0 &&
 				<div>
 					<span>Необходимо заполнить следующие пункты</span>
 					<ul>
-						{this.state.valids.map((el, ind) => <li key={ind}>{el.cause}</li>)}
+						{this.state.invalidArray.map((el, ind) => <li key={ind}>{el.cause}</li>)}
 					</ul>
 				</div>
 				}

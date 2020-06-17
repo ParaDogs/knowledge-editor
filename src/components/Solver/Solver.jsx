@@ -62,9 +62,6 @@ export default class Solver extends React.Component {
 			const groupTasks = []
 			for (let i = 0; i < disciplines.length; i++) {
 				// Количество пар в две недели
-				let s = moment(this.state.data.semester.start)
-				let e = moment(this.state.data.semester.end)
-				let NUM_WEEKS_IN_SEMESTER = moment.duration(e.diff(s)).asWeeks()
 				let numberOfLessons = 1
 				switch (parseInt(times[i], 10)) {
 					case 36:
@@ -79,6 +76,8 @@ export default class Solver extends React.Component {
 					case 144:
 						numberOfLessons = 4
 						break
+					default:
+						numberOfLessons = 1
 				}
 				console.log('NUM_WEEKS_IN_SEMESTER', numberOfLessons)
 				const disciplineType = this.state.knowledge.disciplines.find(el => el.id === disciplines[i]).type
