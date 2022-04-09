@@ -15,7 +15,7 @@
     "jquery": "^3.5.1",
     "jquery-sked-tape": "^2.4.6",
     "later": "RickCarlino/later",
-    "moment": "^2.26.0",
+    "moment": "^2.29.2",
     "multi.js": "^0.5.1",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
