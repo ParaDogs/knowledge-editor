@@ -17,7 +17,7 @@
     "later": "RickCarlino/later",
     "moment": "^2.29.4",
     "multi.js": "^0.5.1",
-    "node-sass": "^4.14.1",
+    "node-sass": "^7.0.0",
     "react": "^16.13.1",
     "react-calendar-timeline": "^0.27.0",
     "react-dom": "^16.13.1",
